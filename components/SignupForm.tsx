@@ -1,9 +1,10 @@
-"use client";
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { waitlistSchema } from '../lib/validations';
-import { z } from 'zod';
+﻿"use client";
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AnimatePresence, motion } from 'framer-motion';
+import { waitlistSchema } from '../lib/validations';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Checkbox } from './ui/checkbox';
@@ -32,40 +33,61 @@ export default function SignupForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      let json: any = null;
+
+      let payload: Record<string, unknown> | null = null;
       try {
-        json = await res.json();
-      } catch (e) {
-        const text = await res.text().catch(() => '');
-        json = { error: text || 'Unexpected response' };
+        payload = await res.json();
+      } catch (jsonErr) {
+        console.error('Failed to parse waitlist response', jsonErr);
       }
-      if (res.ok) {
-        toast({ title: 'You’re on the list! 🎉' });
-        setSuccess('Thanks! You’re on the waitlist.');
+
+      const count = typeof payload?.count === 'number' ? payload.count : null;
+
+      if (res.ok && payload?.success) {
+        toast({ title: "You're on the list!", description: 'We will email you when the course opens.' });
+        setSuccess("You're on the waitlist.");
         reset();
-        // Update the stat counter by dispatching an event
-        window.dispatchEvent(new CustomEvent('waitlist:updated', { detail: json.count }));
-      } else {
-        const message = typeof json?.error === 'string' ? json.error : 'Something went wrong';
-        toast({ title: 'Oops', description: message, variant: 'destructive' });
-        // Log for debugging
-        // eslint-disable-next-line no-console
-        console.error('Signup error', res.status, json);
+        if (count !== null) {
+          window.dispatchEvent(new CustomEvent('waitlist:updated', { detail: count }));
+        }
+        return;
       }
-    } catch (e) {
-      toast({ title: 'Network error', description: 'Please try again later', variant: 'destructive' });
-      // eslint-disable-next-line no-console
-      console.error('Signup network error', e);
+
+      if (res.status === 409 && payload?.reason === 'duplicate') {
+        toast({ title: 'Already joined', description: 'Looks like you are already on the waitlist.' });
+        setSuccess('Thanks for being one of the first to join!');
+        if (count !== null) {
+          window.dispatchEvent(new CustomEvent('waitlist:updated', { detail: count }));
+        }
+        return;
+      }
+
+      const message = typeof payload?.error === 'string' ? payload.error : 'Something went wrong.';
+      toast({ title: 'Something went wrong', description: message, variant: 'destructive' });
+      console.error('Signup error', res.status, payload);
+    } catch (err) {
+      toast({ title: 'Network error', description: 'Please try again later.', variant: 'destructive' });
+      console.error('Signup network error', err);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h3 className="text-2xl font-semibold">Join the Waitlist</h3>
-      <p className="text-mutedForeground mt-2">Get launch updates and an exclusive discount.</p>
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-5">
+    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-2xl mx-auto">
+      <motion.h3 layout className="text-2xl font-semibold">
+        Join the Waitlist
+      </motion.h3>
+      <motion.p layout className="text-mutedForeground mt-2">
+        Get launch updates and an exclusive discount.
+      </motion.p>
+      <motion.form
+        onSubmit={handleSubmit(onSubmit)}
+        className="mt-6 space-y-5"
+        initial={false}
+        animate={{ opacity: submitting ? 0.7 : 1 }}
+        transition={{ duration: 0.2 }}
+      >
         <div>
           <Label htmlFor="name">Name</Label>
           <Input id="name" placeholder="Your name" {...register('name')} aria-invalid={!!errors.name} />
@@ -85,21 +107,37 @@ export default function SignupForm() {
           <Checkbox id="consent" {...register('consent')} />
           <Label htmlFor="consent" className="text-sm text-mutedForeground">
             I agree to be contacted about the course and accept the{' '}
-            <a className="underline" href="/privacy">Privacy Policy</a>.
+            <a className="underline" href="/privacy">
+              Privacy Policy
+            </a>
+            .
           </Label>
         </div>
         {errors.consent && <p className="-mt-3 text-sm text-red-400">{errors.consent.message as string}</p>}
         <div className="flex items-center gap-3">
-          <Button type="submit" disabled={submitting}>
-            {submitting ? 'Submitting…' : 'Join Waitlist'}
-          </Button>
-          {success && <span className="text-emerald-300">{success}</span>}
+          <motion.div whileTap={{ scale: 0.97 }} whileHover={{ scale: submitting ? 1 : 1.02 }}>
+            <Button type="submit" disabled={submitting}>
+              {submitting ? 'Submitting...' : 'Join Waitlist'}
+            </Button>
+          </motion.div>
+          <AnimatePresence>
+            {success && (
+              <motion.span
+                key="success"
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
+                className="text-emerald-300"
+              >
+                {success}
+              </motion.span>
+            )}
+          </AnimatePresence>
         </div>
         <p id="contact" className="text-xs text-mutedForeground">
-          GDPR Notice: We process your data solely to provide course updates. You can request
-          deletion at any time.
+          GDPR Notice: We process your data solely to provide course updates. You can request deletion at any time.
         </p>
-      </form>
-    </div>
+      </motion.form>
+    </motion.div>
   );
 }

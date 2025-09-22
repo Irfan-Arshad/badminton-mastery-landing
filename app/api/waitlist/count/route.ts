@@ -1,25 +1,15 @@
-import { NextResponse } from 'next/server';
-import { prisma, ensureDb } from '../../../../lib/db';
+import { NextResponse } from "next/server";
+import { supabaseServer } from "@/lib/supabase-server";
 
 export async function GET() {
   try {
-    await ensureDb();
-    const count = await prisma.waitlist.count();
-    return NextResponse.json({ count });
-  } catch (e: any) {
-    const msg = String(e?.message || e);
-    if (e?.code === 'P2021' || msg.includes('no such table')) {
-      // Table missing: best-effort create then retry once
-      try {
-        await ensureDb();
-        const count = await prisma.waitlist.count();
-        return NextResponse.json({ count });
-      } catch {
-        return NextResponse.json({ count: 0 });
-      }
-    }
-    // Fallback: don’t block UI; return 0
-    return NextResponse.json({ count: 0 });
+    const supabase = supabaseServer();
+    const { data, error } = await supabase.rpc("waitlist_count");
+
+    if (error) throw error;
+    return NextResponse.json({ count: Number(data) });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ count: 0 }, { status: 200 });
   }
 }
-
