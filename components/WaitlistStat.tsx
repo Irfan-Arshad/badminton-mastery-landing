@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useCallback, useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion, animate } from 'framer-motion';
 
@@ -10,6 +10,7 @@ export default function WaitlistStat() {
   const prefersReduced = useReducedMotion();
 
   const loadCount = useCallback(async () => {
+    setLoading(true);
     try {
       const response = await fetch('/api/waitlist/count', { cache: 'no-store' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -26,18 +27,25 @@ export default function WaitlistStat() {
     }
   }, []);
 
-  useEffect(() => {
-    loadCount();
-    const onUpdated = (event: Event) => {
-      const detail = (event as CustomEvent<number>).detail;
-      if (typeof detail === 'number') {
+  const handleRealtimeUpdate = useCallback(
+    (event: Event) => {
+      const detail = (event as CustomEvent<number | null | undefined>).detail;
+      if (typeof detail === 'number' && Number.isFinite(detail)) {
         setCount(detail);
         setError(null);
+        setLoading(false);
+        return;
       }
-    };
-    window.addEventListener('waitlist:updated', onUpdated as EventListener);
-    return () => window.removeEventListener('waitlist:updated', onUpdated as EventListener);
-  }, [loadCount]);
+      loadCount();
+    },
+    [loadCount],
+  );
+
+  useEffect(() => {
+    loadCount();
+    window.addEventListener('waitlist:updated', handleRealtimeUpdate as EventListener);
+    return () => window.removeEventListener('waitlist:updated', handleRealtimeUpdate as EventListener);
+  }, [loadCount, handleRealtimeUpdate]);
 
   useEffect(() => {
     if (loading) return;
@@ -54,42 +62,45 @@ export default function WaitlistStat() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count, loading, prefersReduced]);
 
-  const statusText = error ? 'Retrying soon' : 'Growing daily';
+  const statusText = error ? 'Retrying soon' : 'and growing';
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="rounded-2xl glass px-6 py-4 flex items-center justify-between"
+      className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-6 text-white"
     >
-      <div>
-        <div className="text-sm text-mutedForeground">Live Waitlist</div>
+      <div className="space-y-2">
         <motion.div
           key={loading ? 'loading' : 'count'}
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
-          className="text-2xl font-semibold"
+          transition={{ duration: 0.35 }}
+          className="text-4xl sm:text-5xl font-semibold tracking-tight"
         >
           {loading ? '...' : display.toLocaleString()}
         </motion.div>
+        <div className="flex items-center gap-2 text-sm uppercase tracking-[0.25em] text-white/70">
+          <span className="inline-flex h-2 w-2 rounded-full bg-lime-300 animate-pulse" aria-hidden />
+          <span>Live Waitlist</span>
+        </div>
       </div>
       <motion.div
-        initial={{ scale: 0.9, opacity: 0.8 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ repeat: prefersReduced ? 0 : Infinity, repeatType: 'mirror', duration: 1.6 }}
-        className="text-emerald-400 text-sm"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.1 }}
+        className="text-sm sm:text-base text-white/80 max-w-xs"
       >
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={statusText}
-            initial={{ opacity: 0, y: 4 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
           >
-            {statusText}
+            {error ? statusText : `${statusText} every day.`}
           </motion.span>
         </AnimatePresence>
       </motion.div>

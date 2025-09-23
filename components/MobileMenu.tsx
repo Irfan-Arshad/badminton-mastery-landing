@@ -32,12 +32,12 @@ export default function MobileMenu({
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-8 w-8 rounded-md bg-emerald-400/90 text-emerald-950 items-center justify-center font-bold">
-                  🏸
+                <span className="inline-flex h-8 w-8 rounded-md bg-lime-400/90 text-slate-900 items-center justify-center font-bold">
+                  B
                 </span>
-                <span className="font-semibold">Menu</span>
+                <span className="font-semibold text-white">Menu</span>
               </div>
-              <button className="focus-ring" onClick={() => onOpenChange(false)} aria-label="Close menu">
+              <button className="focus-ring text-white" onClick={() => onOpenChange(false)} aria-label="Close menu">
                 <X />
               </button>
             </div>
@@ -46,7 +46,7 @@ export default function MobileMenu({
                 <a
                   key={l.href}
                   href={l.href}
-                  className="py-2 text-lg text-mutedForeground hover:text-white"
+                  className="py-2 text-lg text-white/80 hover:text-white"
                   onClick={() => onOpenChange(false)}
                 >
                   {l.label}
@@ -62,4 +62,3 @@ export default function MobileMenu({
     </AnimatePresence>
   );
 }
-

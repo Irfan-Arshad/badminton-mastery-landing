@@ -3,17 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --background: 210 20% 10%; /* deep slate */
-  --foreground: 210 15% 96%;
-  --muted: 210 15% 18%;
-  --muted-foreground: 210 10% 70%;
-  --card: 210 20% 12%;
-  --card-foreground: 210 20% 96%;
-  --border: 210 15% 22%;
-  --input: 210 15% 22%;
-  --ring: 170 80% 45%;
-  --accent: 170 80% 45%; /* emerald/teal */
-  --accent-foreground: 170 15% 10%;
+  --background: 225 56% 6%; /* midnight navy */
+  --foreground: 215 35% 96%;
+  --muted: 225 32% 14%;
+  --muted-foreground: 215 20% 72%;
+  --card: 225 50% 9%;
+  --card-foreground: 215 35% 96%;
+  --border: 226 30% 18%;
+  --input: 226 30% 18%;
+  --ring: 96 72% 60%;
+  --accent: 96 72% 60%; /* vibrant lime */
+  --accent-foreground: 220 65% 14%;
 }
 
 html, body {
@@ -22,16 +22,17 @@ html, body {
 
 body {
   @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];
-  background-image: radial-gradient(circle at 20% 0%, rgba(16,185,129,0.08), transparent 40%),
-    radial-gradient(circle at 80% 20%, rgba(59,130,246,0.08), transparent 40%),
-    linear-gradient(180deg, rgba(255,255,255,0.03), transparent 20%),
-    linear-gradient(transparent, rgba(0,0,0,0.2));
+  background-image: radial-gradient(circle at 18% -10%, rgba(163, 230, 53, 0.18), transparent 46%),
+    radial-gradient(circle at 78% 12%, rgba(59, 130, 246, 0.16), transparent 45%),
+    radial-gradient(circle at 50% 120%, rgba(56, 189, 248, 0.12), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 30%),
+    linear-gradient(transparent, rgba(4, 7, 18, 0.6));
   background-attachment: fixed;
   scroll-behavior: smooth;
 }
 
 .glass {
-  @apply bg-white/5 backdrop-blur-md border border-white/10;
+  @apply bg-white/10 backdrop-blur-lg border border-white/20;
 }
 
 .focus-ring {
@@ -46,7 +47,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(transparent 0, transparent calc(100% - 1px), rgba(255,255,255,0.06) calc(100% - 1px)), linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), rgba(255,255,255,0.06) calc(100% - 1px));
+  background-image: linear-gradient(transparent 0, transparent calc(100% - 1px), rgba(255,255,255,0.05) calc(100% - 1px)), linear-gradient(90deg, transparent 0, transparent calc(100% - 1px), rgba(255,255,255,0.05) calc(100% - 1px));
   background-size: 24px 24px, 24px 24px;
   mask-image: radial-gradient(circle at 50% 10%, black, transparent 70%);
   pointer-events: none;
@@ -61,3 +62,4 @@ body {
     scroll-behavior: auto !important;
   }
 }
+

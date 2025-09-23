@@ -1,11 +1,10 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 const faqs = [
-  { q: 'When does it launch?', a: 'Targeting Q4 this year. Join the waitlist for updates.' },
-  { q: 'What skill levels?', a: 'Beginners to low-advanced. Strong focus on fundamentals.' },
-  { q: 'Equipment needed?', a: 'A racket, shuttlecocks, and access to a court.' },
-  { q: 'Time commitment?', a: 'Short, focused lessons and drills you can fit in weekly.' },
-  { q: 'Refund policy?', a: 'A fair refund policy applies at launch.' },
+  { q: 'When does it launch?', a: 'Planning to launch the course early 2026!' },
+  { q: 'What skill levels?', a: 'Beginners and Intermediates all the way to low-advanced. Strong focus on fundamentals while covering some advanced concepts' },
+  { q: 'Equipment needed?', a: 'Nothing but internet and a phone. This course is fully online. You can apply what you learn at your club session or with your friends and see the improvements firsthand' },
+  { q: 'Time commitment?', a: 'Flexible and Self paced. You can learn at your own pace, and start/stop whenever you please.' },
 ];
 
 export default function FAQ() {
