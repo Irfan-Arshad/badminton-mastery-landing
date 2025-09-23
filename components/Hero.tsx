@@ -1,5 +1,5 @@
 "use client";
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
 import { useCallback, useRef, useState } from 'react';
 import { CheckCircle2, Medal, Shield, Volume2, VolumeX } from 'lucide-react';
 import WaitlistStat from './WaitlistStat';
@@ -14,14 +14,20 @@ export default function Hero() {
   const y = useTransform(scrollY, [0, 400], [0, -60]);
   const o = useTransform(scrollY, [0, 400], [1, 0.6]);
 
-  const toggleAudio = useCallback(() => {
+  const toggleAudio = useCallback(async () => {
     const video = videoRef.current;
     if (!video) return;
     const nextMuted = !muted;
     setMuted(nextMuted);
     video.muted = nextMuted;
-    if (!video.paused && nextMuted) {
-      video.currentTime = video.currentTime;
+    if (!nextMuted) {
+      try {
+        await video.play();
+      } catch (err) {
+        console.warn('Failed to play hero video', err);
+        setMuted(true);
+        video.muted = true;
+      }
     }
   }, [muted]);
 
@@ -52,14 +58,42 @@ export default function Hero() {
         aria-pressed={!muted}
         aria-label={muted ? 'Unmute background video' : 'Mute background video'}
         initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          backgroundColor: muted ? 'rgba(255,255,255,0.10)' : 'rgba(163,230,53,0.22)',
+          borderColor: muted ? 'rgba(255,255,255,0.20)' : 'rgba(163,230,53,0.45)',
+          color: muted ? 'rgba(255,255,255,0.82)' : 'rgba(10,18,8,0.85)'
+        }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
         whileHover={{ scale: 1.05, y: -2 }}
         whileTap={{ scale: 0.95 }}
-        className="absolute right-6 top-24 md:top-28 flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-white/80 backdrop-blur-sm focus-ring"
+        className="absolute right-6 top-24 md:top-28 z-20 pointer-events-auto flex items-center gap-2 rounded-full px-4 py-2 backdrop-blur-sm focus-ring"
       >
-        {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-        <span className="text-sm hidden sm:inline">{muted ? 'Sound Off' : 'Sound On'}</span>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={muted ? 'muted-icon' : 'unmuted-icon'}
+            initial={{ opacity: 0, scale: 0.8, rotate: -20 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0, scale: 0.8, rotate: 20 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="flex"
+          >
+            {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          </motion.span>
+        </AnimatePresence>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={muted ? 'label-off' : 'label-on'}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="text-sm hidden sm:inline"
+          >
+            {muted ? 'Sound Off' : 'Sound On'}
+          </motion.span>
+        </AnimatePresence>
       </motion.button>
       <div className="relative container min-h-screen pt-32 pb-20 md:pt-40 md:pb-24 flex items-center">
         <div className="grid lg:grid-cols-1 gap-12 items-start md:items-center w-full">
