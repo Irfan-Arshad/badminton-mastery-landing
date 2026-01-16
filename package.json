@@ -16,6 +16,8 @@
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
     "@prisma/client": "^5.15.0",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.57.4",
     "autoprefixer": "^10.4.19",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

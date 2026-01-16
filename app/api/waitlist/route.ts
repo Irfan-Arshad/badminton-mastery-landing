@@ -1,11 +1,6 @@
-import { NextResponse } from 'next/server';
-import { z } from 'zod';
-import {
-  fetchSupabaseWaitlistCount,
-  getSupabaseWaitlistConfig,
-  insertSupabaseWaitlistRow,
-  SupabaseWaitlistRequestError,
-} from '../../../lib/supabaseWaitlist';
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import { supabaseServer } from "@/lib/supabase-server";
 
 const schema = z.object({
   name: z.string().min(2).max(80),
@@ -20,35 +15,34 @@ export async function POST(req: Request) {
     const parsed = schema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
-    const config = getSupabaseWaitlistConfig();
-    const payload = {
-      name: parsed.data.name.trim(),
-      email: parsed.data.email.toLowerCase(),
-      phone: parsed.data.phone.trim(),
-      consent: true as const,
-    };
+    const supabase = supabaseServer();
 
-    try {
-      await insertSupabaseWaitlistRow(config, payload);
-    } catch (error) {
-      const supabaseError = error as SupabaseWaitlistRequestError;
-      if (supabaseError.code === '23505' || supabaseError.status === 409) {
-        const count = await fetchSupabaseWaitlistCount(config);
+    const { error: insertError } = await supabase
+      .from("waitlist")
+      .insert([parsed.data]);
+
+    if (insertError) {
+      // Handle duplicate email
+      if (insertError.code === "23505") {
+        const { data: countData } = await supabase.rpc("waitlist_count");
         return NextResponse.json(
-          { success: false, reason: 'duplicate', count },
-          { status: 409 },
+          { success: false, reason: "duplicate", count: Number(countData) },
+          { status: 409 }
         );
       }
-      throw error;
+      throw insertError;
     }
 
-    const count = await fetchSupabaseWaitlistCount(config);
-    return NextResponse.json({ success: true, count }, { status: 200 });
+    // Fetch updated count
+    const { data: count, error: countErr } = await supabase.rpc("waitlist_count");
+    if (countErr) throw countErr;
+
+    return NextResponse.json({ success: true, count: Number(count) }, { status: 200 });
   } catch (err) {
-    console.error('Waitlist POST error:', err);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    console.error(err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

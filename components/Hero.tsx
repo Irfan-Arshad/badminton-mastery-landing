@@ -97,30 +97,20 @@ export default function Hero() {
       </motion.button>
       <div className="relative container min-h-screen pt-32 pb-20 md:pt-40 md:pb-24 flex items-center">
         <div className="grid lg:grid-cols-1 gap-12 items-start md:items-center w-full">
-          <div className="w-full max-w-4xl space-y-10">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <motion.h1
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="flex-1 text-4xl md:text-6xl font-bold tracking-tight text-white"
-              >
-                Master the Core Foundations of Badminton
-              </motion.h1>
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.55 }}
-                className="w-full max-w-md lg:max-w-sm"
-              >
-                <WaitlistStat />
-              </motion.div>
-            </div>
+          <div className="max-w-2xl space-y-8">
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-4xl md:text-6xl font-bold tracking-tight text-white"
+            >
+              Master the Core Foundations of Badminton
+            </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg text-white/80 max-w-2xl"
+              className="text-lg text-white/80"
             >
               Built by a Level 2 certified coach, the programme gives you the exact movement, shot, and strategy drills to accelerate from court rookie to confident competitor.
             </motion.p>
@@ -166,6 +156,14 @@ export default function Hero() {
               <Badge icon={<Shield className="h-4 w-4" />} text="Level 2 Certified Coach" />
               <Badge icon={<Medal className="h-4 w-4" />} text="Ex-Adidas Sponsored" />
               <Badge icon={<CheckCircle2 className="h-4 w-4" />} text="8+ Years Experience" />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.55 }}
+              className="max-w-md"
+            >
+              <WaitlistStat />
             </motion.div>
           </div>
         </div>
