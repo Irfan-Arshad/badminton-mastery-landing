@@ -8,7 +8,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, ...pr
     <input
       ref={ref}
       className={cn(
-        'flex h-10 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-mutedForeground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 border-white/15',
+        'flex h-10 w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-mutedForeground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime-200 focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--background))]',
         className,
       )}
       {...props}
@@ -18,4 +18,3 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(({ className, ...pr
 Input.displayName = 'Input';
 
 export { Input };
-

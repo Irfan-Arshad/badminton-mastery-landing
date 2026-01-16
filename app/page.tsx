@@ -1,6 +1,5 @@
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
-import WaitlistStat from '../components/WaitlistStat';
 import Curriculum from '../components/Curriculum';
 import Coach from '../components/Coach';
 import ValueProps from '../components/ValueProps';
@@ -16,11 +15,6 @@ export default function Page() {
       <Navbar />
       <main className="overflow-hidden">
         <Hero />
-        <section className="py-8">
-          <div className="container">
-            <WaitlistStat />
-          </div>
-        </section>
         <Curriculum />
         <Coach />
         <ValueProps />
@@ -37,4 +31,3 @@ export default function Page() {
     </div>
   );
 }
-

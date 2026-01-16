@@ -1,16 +1,16 @@
-"use client";
+﻿"use client";
+import { motion } from 'framer-motion';
 import { useState } from 'react';
 import MotionInView from './MotionInView';
 
 const testimonials = [
-  { name: 'Alex', role: 'Beginner', text: 'Clear, practical, and motivating. My shots improved fast.' },
-  { name: 'Priya', role: 'Intermediate', text: 'Footwork module alone was worth it. Felt immediate impact.' },
-  { name: 'Tom', role: 'Recreational', text: 'Finally fixed my serve. Great structure and drills.' },
+  { name: 'Donald', role: 'Advanced', text: 'Clear, practical, and motivating. My shots improved fast.' },
+  { name: 'Jarjish', role: 'Intermediate', text: 'Footwork module alone was worth it. Felt immediate impact.' },
+  { name: 'Umar', role: 'Begginer', text: 'Finally fixed my serve. Great structure and drills.' },
 ];
 
 export default function Testimonials() {
   const [index, setIndex] = useState(0);
-  const t = testimonials[index];
   return (
     <section id="testimonials" className="py-20">
       <div className="container">
@@ -18,13 +18,18 @@ export default function Testimonials() {
           <h2 className="text-3xl font-semibold">What Players Say</h2>
         </div>
         <div className="grid lg:grid-cols-3 gap-6 items-stretch">
-          {testimonials.map((item, i) => (
-            <MotionInView key={i}>
-              <div className="rounded-2xl glass p-6 h-full">
+          {testimonials.map((item) => (
+            <MotionInView key={item.name}>
+              <motion.div
+                whileHover={{ y: -6, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+                className="rounded-2xl glass p-6 h-full transition-shadow hover:shadow-soft"
+              >
                 <div className="text-sm text-mutedForeground">{item.role}</div>
-                <div className="mt-2 text-lg">“{item.text}”</div>
+                <div className="mt-2 text-lg">&ldquo;{item.text}&rdquo;</div>
                 <div className="mt-4 font-medium">{item.name}</div>
-              </div>
+              </motion.div>
             </MotionInView>
           ))}
         </div>
@@ -36,11 +41,12 @@ export default function Testimonials() {
               className={`h-2 w-6 rounded-full ${i === index ? 'bg-emerald-400' : 'bg-white/20'}`}
               aria-pressed={i === index}
               aria-label={`Show testimonial ${i + 1}`}
-            />)
-          )}
+            />
+          ))}
         </div>
       </div>
     </section>
   );
 }
+
 
